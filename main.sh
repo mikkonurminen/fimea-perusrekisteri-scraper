@@ -4,9 +4,6 @@ source ./functions.sh
 
 set -eu
 
-lolol
-exit 1
-
 current_date=$(date +%Y-%m-%d-%T)
 wget=$(which wget)
 iconv=$(which iconv)
