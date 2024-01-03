@@ -88,6 +88,8 @@ function hae_ajopvm() {
     [ "${#kk}" -lt 2 ] && kk="0$kk"
 
     ajopvm="$vuosi-$kk-$paiva"
+
+    echo "$ajopvm"
 }
 
 function compare_line_count() {
@@ -100,4 +102,11 @@ function compare_line_count() {
         # TODO Testaa tämä
         echo "$current_date Virhe: päivitetyn $1.txt rivien määrä pienempi kuin edellisen." >> run.log
     fi
+}
+
+function add_ajopvm_column() {
+    { head -1 ./temp/$1.txt \
+        | awk '{ printf "AJOPVM;"; print }'; sed -e 1d ./temp/$1.txt | awk -v ajopvm="$ajopvm" '{ printf ajopvm";"; print }' ; } \
+        | cat > ./temp/$1_temp.txt \
+        && mv ./temp/$1_temp.txt ./temp/$1.txt
 }

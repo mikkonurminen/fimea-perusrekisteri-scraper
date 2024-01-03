@@ -50,7 +50,7 @@ done
 unset i len filet
 
 # $ajopvm muuttuja
-hae_ajopvm
+ajopvm=$(hae_ajopvm)
 
 # Tarkista, onko ensimmäinen kerta kun tiedostot haetaan. Jos ei, niin tallena datat uutena.
 if [ ! -f ./edellinen_ajo/saate.txt ] && [ ! -f ./data/tehdyt_ajot.txt ]; then
@@ -112,18 +112,7 @@ if [ $lc_new_rows -gt 0 ]; then
     new_rows=$(echo "$new_rows" | awk -v ajopvm="$ajopvm" '{ printf ajopvm";"; print }')
 
     # Lisää ajopvm sarake ja arvot tiedostoon. Tästä tulee verrokkitiedosto edellinen_ajo/ kansioon
-    # TODO tee tästä funktio
-    { head -1 ./temp/atc.txt \
-        | awk '{ printf "AJOPVM;"; print }'; sed -e 1d ./temp/atc.txt | awk -v ajopvm="$ajopvm" '{ printf ajopvm";"; print }' ; } \
-        | cat > ./temp/atc_temp.txt \
-        && mv ./temp/atc_temp.txt ./temp/atc.txt
-
-    # TODO JATKA TÄSTÄ $new_rows ei sisällä sarake-riviä, mikäli halutaan lisätä uniikit rivit tiedostoon.
-    # Tosin tämä tulee vain edellinen_ajo, joten sitä ei tarvitse?
-    echo "$new_rows" > ./temp/new_rows.txt
-
-    exit 1
-
+    add_ajopvm_column "atc"
     # 1) Ota header pois; 2) yhdistä uniikit rivit; 3) sort; 4) yhdistä header ja sortatut rivit
     # TODO tee tästä funktio
     echo "$current_date Lisätään uniikit rivit dataan..." >> run.log
@@ -143,9 +132,11 @@ fi
 
 # Korvaa ./edellinen_ajo uudella ajolla
 echo "$current_date Korvataan ./edellinen_ajo uudella ajolla." >> run.log
+# TODO Loop
 cp ./temp/saate.txt ./edellinen_ajo/saate.txt
 cp ./temp/atc.txt ./edellinen_ajo/atc.txt
 
+echo "$new_rows" > ./edellinen_ajo/atc_uudet_rivit.txt
 
 # Lisää saate tehtyihin ajoihin TODO pitäisikö siirtää myöhemmäksi
 cat ./temp/saate.txt >> ./data/tehdyt_ajot.txt
